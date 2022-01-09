@@ -1,0 +1,34 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.30114.105
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wordleans.Api", "Wordleans.Api\Wordleans.Api.csproj", "{EC4572FA-A9A6-432C-AF60-A92117810651}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wordleans.Kernel", "Wordleans.Kernel\Wordleans.Kernel.csproj", "{783579BD-0E74-44AE-A9D3-31399933F84C}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wordleans.Tests", "Wordleans.Tests\Wordleans.Tests.csproj", "{C715F634-9579-4881-B062-BBADBDB6C0D8}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EC4572FA-A9A6-432C-AF60-A92117810651}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EC4572FA-A9A6-432C-AF60-A92117810651}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EC4572FA-A9A6-432C-AF60-A92117810651}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EC4572FA-A9A6-432C-AF60-A92117810651}.Release|Any CPU.Build.0 = Release|Any CPU
+		{783579BD-0E74-44AE-A9D3-31399933F84C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{783579BD-0E74-44AE-A9D3-31399933F84C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{783579BD-0E74-44AE-A9D3-31399933F84C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{783579BD-0E74-44AE-A9D3-31399933F84C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C715F634-9579-4881-B062-BBADBDB6C0D8}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C715F634-9579-4881-B062-BBADBDB6C0D8}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C715F634-9579-4881-B062-BBADBDB6C0D8}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C715F634-9579-4881-B062-BBADBDB6C0D8}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
