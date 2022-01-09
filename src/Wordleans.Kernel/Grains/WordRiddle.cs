@@ -8,8 +8,9 @@ public class WordRiddle : Grain, IWordRiddle
 {
     private readonly ILogger<WordRiddle> _logger;
     private IWordDictionary? _dictionary;
-    private string _todaysword;
+    private string _winningWord;
     private DateTimeOffset _contestDay;
+    private readonly List<GuessResult> _history = new();
 
     public WordRiddle(ILogger<WordRiddle> logger)
     {
@@ -26,10 +27,10 @@ public class WordRiddle : Grain, IWordRiddle
         _logger.LogInformation("Contest day is {Day}", _contestDay);
 
         var seed = _contestDay.DayOfYear + _contestDay.Year * 1000;
-        _todaysword = await _dictionary.GetRandomWord(seed);
-        _logger.LogInformation("Today's word is {Word}", _todaysword);
+        _winningWord = await _dictionary.GetRandomWord(seed);
+        _logger.LogInformation("Today's word is {Word}", _winningWord);
 
-        if (String.IsNullOrEmpty(_todaysword))
+        if (String.IsNullOrEmpty(_winningWord))
         {
             throw new Exception("System misconfigured");
         }
@@ -52,23 +53,23 @@ public class WordRiddle : Grain, IWordRiddle
             return GuessResult.InvalidWord(word);
         }
 
-        if (word.Length != _todaysword.Length)
+        if (word.Length != _winningWord.Length)
         {
-            throw new Exception($"Word must be of {_todaysword.Length} letters");
+            throw new Exception($"Word must be of {_winningWord.Length} letters");
         }
 
-        var matches = new GuessResult.MatchResult[_todaysword.Length];
+        var matches = new GuessResult.MatchResult[_winningWord.Length];
         
-        for (int c = 0; c < _todaysword.Length; c++)
+        for (int c = 0; c < _winningWord.Length; c++)
         {
-            var currentChar = _todaysword[c];
+            var currentChar = _winningWord[c];
             if (word[c] == currentChar)
             {
                 matches[c] = GuessResult.MatchResult.CorrectSpot;
                 continue;
             }
 
-            if (_todaysword.Contains(word[c]))
+            if (_winningWord.Contains(word[c]))
             {
                 matches[c] = GuessResult.MatchResult.WrongSpot;
             }
@@ -77,6 +78,25 @@ public class WordRiddle : Grain, IWordRiddle
                 matches[c] = GuessResult.MatchResult.NotPresent;
             }
         }
-        return GuessResult.ForMatches(word, matches);
+
+        bool isLastGuess = _history.Count >= Defaults.MaxAttempts - 1; 
+        if (isLastGuess)
+        {
+            return GuessResult.GameOver(word, matches);
+        }
+
+        var result = GuessResult.ForMatches(word, matches);
+        _history.Add(result);
+        return result;
+    }
+
+    public Task<RiddleStatus> GetStatus()
+    {
+        var status = new RiddleStatus()
+        {
+            Guesses = _history.ToArray(),
+            WinningWord = _winningWord
+        };
+        return Task.FromResult(status);
     }
 }

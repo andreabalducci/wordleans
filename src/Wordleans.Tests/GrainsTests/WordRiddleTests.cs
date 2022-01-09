@@ -1,5 +1,4 @@
 using System;
-using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Moq;
@@ -76,5 +75,46 @@ public class WordRiddleTests : TestKitBase
         ).ToArray();
 
         Assert.Equal(matches, result.Matches);
+    }
+
+    [Fact]
+    public async Task ShouldTrackGameHistory()
+    {
+        _dictionary.Setup(x => x.GetRandomWord(It.IsAny<int>())).ReturnsAsync("FOUND");
+        _dictionary.Setup(x => x.IsValidWord(It.IsAny<string>())).ReturnsAsync(true);
+
+        var riddle = await Silo.CreateGrainAsync<WordRiddle>("game/2020-01-01");
+
+        await riddle.Guess("NOON1");
+        await riddle.Guess("NOON2");
+        await riddle.Guess("NOON3");
+
+        var status = await riddle.GetStatus();
+
+        Assert.Collection(status.Guesses,
+            h => { Assert.Equal("NOON1", h.Word); },
+            h => { Assert.Equal("NOON2", h.Word); },
+            h => { Assert.Equal("NOON3", h.Word); }
+        );
+        
+        Assert.Equal("FOUND", status.WinningWord);
+    }
+
+    [Fact]
+    public async Task ShouldEndGameAfterSixFailedGuesses()
+    {
+        _dictionary.Setup(x => x.GetRandomWord(It.IsAny<int>())).ReturnsAsync("FOUND");
+        _dictionary.Setup(x => x.IsValidWord(It.IsAny<string>())).ReturnsAsync(true);
+
+        var riddle = await Silo.CreateGrainAsync<WordRiddle>("game/2020-01-01");
+
+        await riddle.Guess("NOON1");
+        await riddle.Guess("NOON1");
+        await riddle.Guess("NOON1");
+        await riddle.Guess("NOON1");
+        await riddle.Guess("NOON1");
+        var lastGuess = await riddle.Guess("NOON1");
+
+        Assert.True(lastGuess.GameEnded);
     }
 }
