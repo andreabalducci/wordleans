@@ -11,10 +11,11 @@ namespace Wordleans.Tests.GrainsTests;
 
 public class WordRiddleTests : TestKitBase
 {
-    private readonly Mock<IWordDictionary>? _dictionary;
+    private readonly Mock<IWordDictionary> _dictionary;
 
     public WordRiddleTests()
     {
+        Assert.False(Defaults.ScaleOutDictionary);
         _dictionary = Silo.AddProbe<IWordDictionary>(Defaults.DictionaryName);
     }
 
@@ -116,5 +117,6 @@ public class WordRiddleTests : TestKitBase
         var lastGuess = await riddle.Guess("NOON1");
 
         Assert.True(lastGuess.GameEnded);
+        Assert.False(lastGuess.HasWon);
     }
 }

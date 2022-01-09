@@ -2,8 +2,7 @@ using Orleans;
 
 namespace Wordleans.Api.Grains;
 
-public interface IWordDictionary : IGrainWithStringKey
+public interface IWordDictionary : IGrainWithStringKey, IWordDictionaryOperations
 {
-    Task<bool> IsValidWord(string text);
-    Task<string> GetRandomWord(int seed);
+    Task<DictionaryData> GetFullDictionary();
 }

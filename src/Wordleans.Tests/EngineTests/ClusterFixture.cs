@@ -9,7 +9,7 @@ namespace Wordleans.Tests.EngineTests;
 public class ClusterFixture : IDisposable
 {
     private const string OutputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss} [{SourceContext}] {EventId} [{Level}] {Message}{NewLine}{Exception}";
-    public TestCluster Cluster { get; private set; }
+    public TestCluster? Cluster { get; private set; }
 
     public ClusterFixture(IMessageSink sink)
     {
@@ -54,6 +54,7 @@ public class ClusterFixture : IDisposable
         var cfg = new LoggerConfiguration();
         configure(cfg);
         Log.Logger = cfg 
+            .MinimumLevel.Debug()
             .MinimumLevel.Override("Orleans", LogEventLevel.Warning)
             .MinimumLevel.Override("Orleans.Runtime.Silo", LogEventLevel.Error)
             .MinimumLevel.Override("Runtime.GrainDirectory.AdaptiveDirectoryCacheMaintainer", LogEventLevel.Warning)
@@ -68,7 +69,6 @@ public class ClusterFixture : IDisposable
         {
             Cluster.StopAllSilos();
         }
-
         
         Log.CloseAndFlush();
     }

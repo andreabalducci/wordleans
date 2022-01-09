@@ -1,6 +1,7 @@
 using System;
 using System.Diagnostics;
 using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 using Orleans;
 using Serilog;
@@ -20,10 +21,10 @@ public class EngineTests : IDisposable
     {
         // workaround for showing logs in rider
         _fixture = new ClusterFixture(helper);
-        _client = _fixture.Cluster.Client;
+        _client = _fixture.Cluster!.Client;
     }
-    
-    [Fact]
+
+    [Fact(Skip = "long running")]
     public async Task RunGame()
     {
         var player = _client.GetGrain<IPlayer>("Player_1");
@@ -43,21 +44,51 @@ public class EngineTests : IDisposable
         Assert.True(result.HasWon);
     }
 
-    [Fact(Skip = "incomplete")]
+//    [Fact(Skip = "long running")]
+    [Fact]
     public async Task LoadTest()
     {
+        string[][] guesses =
+        {
+            new[] { "NOONE", "TESTM", "WOUND", "WORLD", "HELLO", "CRANK" },
+            new[] { "NOONE", "TESTM", "WOUND", "WORLD", "HELLO", "HELLO" },
+            new[] { "WORLD", "CRANK" },
+            new[] { "CRANK" }
+        };
+
         var sw = new Stopwatch();
         sw.Start();
-        var tasks = Enumerable.Range(0, 100).Select(async i =>
+        int playing = 0;
+        int won = 0;
+        int lost = 0;
+        
+        var tasks = Enumerable.Range(0, 1).Select(async i =>
         {
-            var player = _client.GetGrain<IPlayer>($"Player_{i}");
-            await player.EnterGuess("UUUUU");
+//            var script = guesses[i % guesses.Length];
+            var script = guesses[1];
+            var robot = _client.GetGrain<IRobot>($"Robot_{i:D3}");
+            var player = $"Player_{i:D3}";
+            var result = await robot.Play(player, script);
+            int temp = result switch
+            {
+                RobotPlayResult.Lost => Interlocked.Increment(ref lost),
+                RobotPlayResult.Playing => Interlocked.Increment(ref playing),
+                RobotPlayResult.Won => Interlocked.Increment(ref won),
+                _ => 0
+            };
         });
 
         await Task.WhenAll(tasks);
         sw.Stop();
-        
-        Log.Logger.Information("Time elapsed {elapsed}", sw.Elapsed);
+
+        Log.Logger.Information
+        (
+            "Time elapsed {elapsed}. Won {Won} Lost {Lost} Playing {Playing}", 
+            sw.Elapsed,
+            won,
+            lost,
+            playing
+        );
     }
 
     public void Dispose()

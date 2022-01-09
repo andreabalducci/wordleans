@@ -7,8 +7,8 @@ namespace Wordleans.Kernel.Grains;
 public class WordRiddle : Grain, IWordRiddle
 {
     private readonly ILogger<WordRiddle> _logger;
-    private IWordDictionary? _dictionary;
-    private string _winningWord;
+    private IWordDictionaryOperations? _dictionary;
+    private string? _winningWord;
     private DateTimeOffset _contestDay;
     private readonly List<GuessResult> _history = new();
 
@@ -19,7 +19,15 @@ public class WordRiddle : Grain, IWordRiddle
 
     public override async Task OnActivateAsync()
     {
-        _dictionary = GrainFactory.GetGrain<IWordDictionary>(Defaults.DictionaryName);
+        if (Defaults.ScaleOutDictionary)
+        {
+            _dictionary = GrainFactory.GetGrain<IWordDictionaryCache>(Defaults.DictionaryName);
+        }
+        else
+        {
+            _dictionary = GrainFactory.GetGrain<IWordDictionary>(Defaults.DictionaryName);
+        }
+
 
         var contestDayString = this.GetPrimaryKeyString().Split("/")[1];
         _contestDay = DateTimeOffset.Parse(contestDayString);
@@ -46,23 +54,23 @@ public class WordRiddle : Grain, IWordRiddle
         word = word.ToUpperInvariant();
 
         // TODO -> slow, move to service grain
-        var isValid = await _dictionary.IsValidWord(word);
+        var isValid = await _dictionary!.IsValidWord(word);
 
         if (!isValid)
         {
             return GuessResult.InvalidWord(word);
         }
 
-        if (word.Length != _winningWord.Length)
+        if (word.Length != _winningWord!.Length)
         {
-            throw new Exception($"Word must be of {_winningWord.Length} letters");
+            throw new Exception($"Word must be of {_winningWord!.Length} letters");
         }
 
-        var matches = new GuessResult.MatchResult[_winningWord.Length];
+        var matches = new GuessResult.MatchResult[_winningWord!.Length];
         
-        for (int c = 0; c < _winningWord.Length; c++)
+        for (int c = 0; c < _winningWord!.Length; c++)
         {
-            var currentChar = _winningWord[c];
+            var currentChar = _winningWord![c];
             if (word[c] == currentChar)
             {
                 matches[c] = GuessResult.MatchResult.CorrectSpot;
@@ -79,13 +87,11 @@ public class WordRiddle : Grain, IWordRiddle
             }
         }
 
-        bool isLastGuess = _history.Count >= Defaults.MaxAttempts - 1; 
-        if (isLastGuess)
-        {
-            return GuessResult.GameOver(word, matches);
-        }
-
-        var result = GuessResult.ForMatches(word, matches);
+        bool isLastGuess = _history.Count >= Defaults.MaxAttempts - 1;
+        var result = isLastGuess 
+            ? GuessResult.GameOver(word, matches) 
+            : GuessResult.ForMatches(word, matches);
+        
         _history.Add(result);
         return result;
     }
@@ -95,7 +101,7 @@ public class WordRiddle : Grain, IWordRiddle
         var status = new RiddleStatus()
         {
             Guesses = _history.ToArray(),
-            WinningWord = _winningWord
+            WinningWord = _winningWord!
         };
         return Task.FromResult(status);
     }

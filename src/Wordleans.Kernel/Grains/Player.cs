@@ -9,7 +9,7 @@ public class Player : Grain, IPlayer
 {
     private readonly IClock _clock;
     private readonly ILogger _logger;
-    private PlayerStatistics _stats = new();
+    private readonly PlayerStatistics _stats = new();
     public Player(IClock clock, ILogger<Player> logger)
     {
         _clock = clock;
