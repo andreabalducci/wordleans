@@ -62,10 +62,10 @@ public class EngineTests : IDisposable
         int won = 0;
         int lost = 0;
         
-        var tasks = Enumerable.Range(0, 1).Select(async i =>
+        var tasks = Enumerable.Range(0, 100).Select(async i =>
         {
-//            var script = guesses[i % guesses.Length];
-            var script = guesses[1];
+            var script = guesses[i % guesses.Length];
+//            var script = guesses[1];
             var robot = _client.GetGrain<IRobot>($"Robot_{i:D3}");
             var player = $"Player_{i:D3}";
             var result = await robot.Play(player, script);

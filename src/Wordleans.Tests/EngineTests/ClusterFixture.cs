@@ -54,7 +54,8 @@ public class ClusterFixture : IDisposable
         var cfg = new LoggerConfiguration();
         configure(cfg);
         Log.Logger = cfg 
-            .MinimumLevel.Debug()
+            .MinimumLevel.Information()
+            .MinimumLevel.Override("Wordleans.Tests.EngineTests", LogEventLevel.Debug)
             .MinimumLevel.Override("Orleans", LogEventLevel.Warning)
             .MinimumLevel.Override("Orleans.Runtime.Silo", LogEventLevel.Error)
             .MinimumLevel.Override("Runtime.GrainDirectory.AdaptiveDirectoryCacheMaintainer", LogEventLevel.Warning)

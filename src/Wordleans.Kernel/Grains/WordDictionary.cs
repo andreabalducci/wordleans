@@ -3,9 +3,11 @@ using Orleans;
 using Wordleans.Api.Grains;
 
 namespace Wordleans.Kernel.Grains;
+
 public class WordDictionary : Grain, IWordDictionary
 {
     private DictionaryData? _data;
+
     public override async Task OnActivateAsync()
     {
         var id = this.GetPrimaryKeyString();
@@ -16,22 +18,19 @@ public class WordDictionary : Grain, IWordDictionary
         this._data = new DictionaryData(words);
     }
 
-    public async Task<bool> IsValidWord(string text)
+    public Task<bool> IsValidWord(string text)
     {
-        await Task.Delay(Defaults.SimulatedNetworkDelay);
         var found = this._data!.ContainsWord(text);
-        return found;
+        return Task.FromResult(found);
     }
 
-    public async Task<string> GetRandomWord(int seed)
+    public Task<string> GetRandomWord(int seed)
     {
-        await Task.Delay(Defaults.SimulatedNetworkDelay);
-        return _data!.GetWordBySeed(seed);
+        return Task.FromResult(_data!.GetWordBySeed(seed));
     }
 
-    public async Task<DictionaryData> GetFullDictionary()
+    public Task<DictionaryData> GetFullDictionary()
     {
-        await Task.Delay(Defaults.SimulatedNetworkDelay);
-        return _data!;
+        return Task.FromResult(_data!);
     }
 }

@@ -32,11 +32,11 @@ public class WordRiddle : Grain, IWordRiddle
         var contestDayString = this.GetPrimaryKeyString().Split("/")[1];
         _contestDay = DateTimeOffset.Parse(contestDayString);
 
-        _logger.LogInformation("Contest day is {Day}", _contestDay);
+        _logger.LogDebug("Contest day is {Day}", _contestDay);
 
         var seed = _contestDay.DayOfYear + _contestDay.Year * 1000;
         _winningWord = await _dictionary.GetRandomWord(seed);
-        _logger.LogInformation("Today's word is {Word}", _winningWord);
+        _logger.LogDebug("Today's word is {Word}", _winningWord);
 
         if (String.IsNullOrEmpty(_winningWord))
         {

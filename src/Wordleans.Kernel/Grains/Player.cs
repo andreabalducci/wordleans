@@ -23,7 +23,7 @@ public class Player : Grain, IPlayer
 
         var riddleId = $"{playerId}/{today}";
         
-        _logger.LogInformation("Today's game is {RiddleId}", riddleId);
+        _logger.LogDebug("Today's game is {RiddleId}", riddleId);
 
         return riddleId;
     }
