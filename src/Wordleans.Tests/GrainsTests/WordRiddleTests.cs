@@ -54,28 +54,26 @@ public class WordRiddleTests : TestKitBase
     }
 
     [Theory]
-    [InlineData("CDEAB", "ZULFX", "!!!!!")]
-    [InlineData("CDEAB", "ABCDE", "xxxxx")]
-    [InlineData("ABCDE", "ABCDE", "ooooo")]
-    [InlineData("ABCDE", "BBCDX", "xooo!")]
+    [InlineData("CDEAB", "ZULFX", "⬛⬛⬛⬛⬛")]
+    [InlineData("CDEAB", "ABCDE", "🟨🟨🟨🟨🟨")]
+    [InlineData("ABCDE", "ABCDE", "🟩🟩🟩🟩🟩")]
+    [InlineData("ABCDE", "BBCDX", "🟨🟩🟩🟩⬛")]
     public async Task ShouldMatch(string expected, string guess, string matchSummary)
     {
         _dictionary.Setup(x => x.GetRandomWord(It.IsAny<int>())).ReturnsAsync(expected);
         _dictionary.Setup(x => x.IsValidWord(It.IsAny<string>())).ReturnsAsync(true);
 
         var riddle = await Silo.CreateGrainAsync<WordRiddle>("game/2020-01-01");
-
         var result = await riddle.Guess(guess);
-        var matches = matchSummary.Select(x => x switch
-            {
-                'x' => GuessResult.MatchResult.WrongSpot,
-                '!' => GuessResult.MatchResult.NotPresent,
-                'o' => GuessResult.MatchResult.CorrectSpot,
-                _ => throw new Exception($"Invalid option '{x}'")
-            }
-        ).ToArray();
 
-        Assert.Equal(matches, result.Matches);
+        var strip = String.Join("",result.Matches.Select(x => x switch
+        {
+            GuessResult.MatchResult.CorrectSpot => "🟩",
+            GuessResult.MatchResult.NotPresent => "⬛",
+            GuessResult.MatchResult.WrongSpot => "🟨"
+        }));
+        
+        Assert.Equal(matchSummary, strip);
     }
 
     [Fact]
