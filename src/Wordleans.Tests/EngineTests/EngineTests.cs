@@ -61,21 +61,28 @@ public class EngineTests : IDisposable
         int playing = 0;
         int won = 0;
         int lost = 0;
-        
+
         var tasks = Enumerable.Range(0, 100).Select(async i =>
         {
-            var script = guesses[i % guesses.Length];
-//            var script = guesses[1];
-            var robot = _client.GetGrain<IRobot>($"Robot_{i:D3}");
-            var player = $"Player_{i:D3}";
-            var result = await robot.Play(player, script);
-            int temp = result switch
+            try
             {
-                RobotPlayResult.Lost => Interlocked.Increment(ref lost),
-                RobotPlayResult.Playing => Interlocked.Increment(ref playing),
-                RobotPlayResult.Won => Interlocked.Increment(ref won),
-                _ => 0
-            };
+                var script = guesses[i % guesses.Length];
+//            var script = guesses[1];
+                var robot = _client.GetGrain<IRobot>($"Robot_{i:D3}");
+                var player = $"Player_{i:D3}";
+                var result = await robot.Play(player, script);
+                int temp = result switch
+                {
+                    RobotPlayResult.Lost => Interlocked.Increment(ref lost),
+                    RobotPlayResult.Playing => Interlocked.Increment(ref playing),
+                    RobotPlayResult.Won => Interlocked.Increment(ref won),
+                    _ => 0
+                };
+            }
+            catch (Exception e)
+            {
+                Log.Logger.Error(e,"Run {i} failed", i);
+            }       
         });
 
         await Task.WhenAll(tasks);
@@ -83,7 +90,7 @@ public class EngineTests : IDisposable
 
         Log.Logger.Information
         (
-            "Time elapsed {elapsed}. Won {Won} Lost {Lost} Playing {Playing}", 
+            "Time elapsed {elapsed}. Won {Won} Lost {Lost} Playing {Playing}",
             sw.Elapsed,
             won,
             lost,
