@@ -1,4 +1,5 @@
 using System.IO.Pipelines;
+using Microsoft.Extensions.Logging;
 
 namespace Orleans.ChaosMonkey;
 
@@ -7,11 +8,13 @@ public class UnreliablePipeReader : PipeReader
     private static int _counter;
     private readonly PipeReader _pipeReaderImplementation;
     private readonly ChaosOptions _options;
+    private readonly ILogger _logger;
 
-    public UnreliablePipeReader(PipeReader pipeReaderImplementation, ChaosOptions options)
+    public UnreliablePipeReader(PipeReader pipeReaderImplementation, ChaosOptions options, ILogger logger)
     {
         _pipeReaderImplementation = pipeReaderImplementation;
         _options = options;
+        _logger = logger;
     }
 
     public override void AdvanceTo(SequencePosition consumed)

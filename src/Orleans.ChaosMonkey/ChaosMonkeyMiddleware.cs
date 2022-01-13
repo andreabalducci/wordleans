@@ -4,14 +4,15 @@ using Orleans.Configuration;
 
 namespace Orleans.ChaosMonkey;
 
-public class SlowNetworkMiddleware
+public class ChaosMonkeyMiddleware
 {
     private readonly ConnectionDelegate _next;
     private readonly SiloConnectionOptions _options;
     private readonly ChaosOptions _chaosOptions;
     private readonly ILogger _logger;
 
-    public SlowNetworkMiddleware(string name,
+    public ChaosMonkeyMiddleware(
+        string name,
         ConnectionDelegate next,
         SiloConnectionOptions options,
         ILoggerFactory loggerFactory,
@@ -25,25 +26,11 @@ public class SlowNetworkMiddleware
 
     public async Task OnConnectionAsync(ConnectionContext connection)
     {
-        // if (_logger.IsEnabled(LogLevel.Debug))
-        // {
-        //     var local = connection.LocalEndPoint.Serialize();
-        //     var remote = connection.RemoteEndPoint.Serialize();
-        //     _logger.LogDebug
-        //     (
-        //         "Connection Items {@Local} => {@Remote}", 
-        //         local.ToString(), 
-        //         remote
-        //     );
-        //     
-        //     _logger.LogDebug("Connection transport {@Pipe}", connection.Transport);
-        // }
-
         var originalTransport = connection.Transport;
 
         try
         {
-            connection.Transport = new UnreliableDuplexPipe(originalTransport, _chaosOptions);
+            connection.Transport = new UnreliableDuplexPipe(originalTransport, _chaosOptions, _logger);
             await _next(connection);
         }
         finally

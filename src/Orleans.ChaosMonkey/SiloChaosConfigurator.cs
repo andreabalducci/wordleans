@@ -14,6 +14,11 @@ public class SiloChaosConfigurator : ISiloConfigurator
     public void Configure(ISiloBuilder siloBuilder)
     {
         var chaosOptions = new ChaosOptions($"Silo {_counter++}");
+        siloBuilder.Configure<SiloMessagingOptions>(o =>
+        {
+            o.SystemResponseTimeout = TimeSpan.FromSeconds(5);
+        });
+        
         siloBuilder.Configure<SiloConnectionOptions>(siloConnectionOptions =>
         {
             siloConnectionOptions.ConfigureSiloInboundConnection(connectionBuilder =>
@@ -32,15 +37,19 @@ public class SiloChaosConfigurator : ISiloConfigurator
     }
 
 
-    private static void AddMiddleware(string name, IConnectionBuilder connectionBuilder, SiloConnectionOptions options,
+    private static void AddMiddleware(
+        string name, 
+        IConnectionBuilder connectionBuilder, 
+        SiloConnectionOptions options,
         ChaosOptions chaosOptions)
     {
         var loggerFactory =
             connectionBuilder.ApplicationServices.GetService(typeof(ILoggerFactory)) as ILoggerFactory ??
             NullLoggerFactory.Instance;
+        
         connectionBuilder.Use(next =>
         {
-            var middleware = new SlowNetworkMiddleware(name, next, options, loggerFactory, chaosOptions);
+            var middleware = new ChaosMonkeyMiddleware(name, next, options, loggerFactory, chaosOptions);
             return middleware.OnConnectionAsync;
         });
     }
