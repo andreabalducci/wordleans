@@ -50,8 +50,8 @@ public class EngineTests : IDisposable
     {
         string[][] guesses =
         {
-            new[] { "NOONE", "TESTM", "WOUND", "WORLD", "HELLO", "CRANK" },
-            new[] { "NOONE", "TESTM", "WOUND", "WORLD", "HELLO", "HELLO" },
+            new[] { "HELLO", "HELLO", "WOUND", "WORLD", "HELLO", "CRANK" },
+            new[] { "HELLO", "HELLO", "WOUND", "WORLD", "HELLO", "HELLO" },
             new[] { "WORLD", "CRANK" },
             new[] { "CRANK" }
         };
@@ -61,6 +61,7 @@ public class EngineTests : IDisposable
         int playing = 0;
         int won = 0;
         int lost = 0;
+        int exceptions = 0;
 
         var tasks = Enumerable.Range(0, 100).Select(async i =>
         {
@@ -81,6 +82,7 @@ public class EngineTests : IDisposable
             }
             catch (Exception e)
             {
+                Interlocked.Increment(ref exceptions);
                 Log.Logger.Error(e,"Run {i} failed", i);
             }       
         });
@@ -90,11 +92,12 @@ public class EngineTests : IDisposable
 
         Log.Logger.Information
         (
-            "Time elapsed {elapsed}. Won {Won} Lost {Lost} Playing {Playing}",
+            "Time elapsed {elapsed}. Won {Won} Lost {Lost} Playing {Playing} Exceptions {Exceptions}",
             sw.Elapsed,
             won,
             lost,
-            playing
+            playing,
+            exceptions
         );
     }
 

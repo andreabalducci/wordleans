@@ -1,23 +1,25 @@
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Connections;
 using Microsoft.Extensions.Logging;
 using Orleans.Configuration;
 
-namespace Wordleans.Tests.EngineTests;
+namespace Orleans.ChaosMonkey;
 
 public class SlowNetworkMiddleware
 {
     private readonly ConnectionDelegate _next;
     private readonly SiloConnectionOptions _options;
+    private readonly ChaosOptions _chaosOptions;
     private readonly ILogger _logger;
 
     public SlowNetworkMiddleware(string name,
         ConnectionDelegate next,
         SiloConnectionOptions options,
-        ILoggerFactory loggerFactory)
+        ILoggerFactory loggerFactory,
+        ChaosOptions chaosOptions)
     {
         _next = next;
         _options = options;
+        _chaosOptions = chaosOptions;
         _logger = loggerFactory.CreateLogger($"{GetType().FullName}.{name}");
     }
 
@@ -41,7 +43,7 @@ public class SlowNetworkMiddleware
 
         try
         {
-            connection.Transport = new UnreliableDuplexPipe(originalTransport);
+            connection.Transport = new UnreliableDuplexPipe(originalTransport, _chaosOptions);
             await _next(connection);
         }
         finally

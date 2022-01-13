@@ -1,21 +1,17 @@
-using System;
-using System.Buffers;
 using System.IO.Pipelines;
-using System.Threading;
-using System.Threading.Tasks;
-using Serilog;
-using Wordleans.Api.Grains;
 
-namespace Wordleans.Tests.EngineTests;
+namespace Orleans.ChaosMonkey;
 
 public class UnreliablePipeReader : PipeReader
 {
     private static int _counter;
     private readonly PipeReader _pipeReaderImplementation;
+    private readonly ChaosOptions _options;
 
-    public UnreliablePipeReader(PipeReader pipeReaderImplementation)
+    public UnreliablePipeReader(PipeReader pipeReaderImplementation, ChaosOptions options)
     {
         _pipeReaderImplementation = pipeReaderImplementation;
+        _options = options;
     }
 
     public override void AdvanceTo(SequencePosition consumed)
@@ -40,14 +36,7 @@ public class UnreliablePipeReader : PipeReader
 
     public override async ValueTask<ReadResult> ReadAsync(CancellationToken cancellationToken = new CancellationToken())
     {
-        var i = Interlocked.Increment(ref _counter);
-        if (i % 100 == 1)
-        {
-            Log.Logger.Warning("About to crash network #{i}", i);
-            throw new Exception($"CHAOS #{i}!!!!");
-        }
-
-        await Task.Delay(Defaults.SimulatedNetworkDelay, cancellationToken);
+        await _options.ReadAsync(cancellationToken);
         return await _pipeReaderImplementation.ReadAsync(cancellationToken);
     }
 

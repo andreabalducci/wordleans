@@ -1,4 +1,5 @@
 using System;
+using Orleans.ChaosMonkey;
 using Orleans.TestingHost;
 using Serilog;
 using Serilog.Events;
@@ -8,7 +9,9 @@ namespace Wordleans.Tests.EngineTests;
 
 public class ClusterFixture : IDisposable
 {
-    private const string OutputTemplate = "{Timestamp:yyyy-MM-dd HH:mm:ss} [{SourceContext}] {EventId} [{Level}] {Message}{NewLine}{Exception}";
+    private const string OutputTemplate =
+        "{Timestamp:yyyy-MM-dd HH:mm:ss} [{SourceContext}] {EventId} [{Level}] {Message}{NewLine}{Exception}";
+
     public TestCluster? Cluster { get; private set; }
 
     public ClusterFixture(IMessageSink sink)
@@ -43,6 +46,7 @@ public class ClusterFixture : IDisposable
     {
         Cluster = new TestClusterBuilder(3)
             .AddSiloBuilderConfigurator<TestEngineSiloConfigurator>()
+            .AddSiloBuilderConfigurator<SiloChaosConfigurator>()
             .Build();
 
         Cluster.Deploy();
@@ -53,7 +57,7 @@ public class ClusterFixture : IDisposable
     {
         var cfg = new LoggerConfiguration();
         configure(cfg);
-        Log.Logger = cfg 
+        Log.Logger = cfg
             .MinimumLevel.Information()
             .MinimumLevel.Override("Wordleans.Tests.EngineTests", LogEventLevel.Debug)
             .MinimumLevel.Override("Orleans", LogEventLevel.Warning)
@@ -70,7 +74,7 @@ public class ClusterFixture : IDisposable
         {
             Cluster.StopAllSilos();
         }
-        
+
         Log.CloseAndFlush();
     }
 }
