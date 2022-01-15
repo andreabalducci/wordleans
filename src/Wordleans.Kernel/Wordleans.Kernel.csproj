@@ -15,7 +15,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\wordleans.api\wordleans.api.csproj" />
+    <ProjectReference Include="..\Wordleans.Api\Wordleans.Api.csproj" />
   </ItemGroup>
 
 </Project>
