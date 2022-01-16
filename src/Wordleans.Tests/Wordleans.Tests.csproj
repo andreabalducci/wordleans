@@ -27,8 +27,8 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Orleans.ChaosMonkey\Orleans.ChaosMonkey.csproj" />
-    <ProjectReference Include="..\wordleans.api\wordleans.api.csproj" />
-    <ProjectReference Include="..\wordleans.kernel\wordleans.kernel.csproj" />
+    <ProjectReference Include="..\Wordleans.Api\Wordleans.Api.csproj" />
+    <ProjectReference Include="..\Wordleans.Kernel\Wordleans.Kernel.csproj" />
   </ItemGroup>
 
   <ItemGroup>
