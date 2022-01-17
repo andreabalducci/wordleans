@@ -1,6 +1,6 @@
 using System.Threading.Tasks;
 using Orleans.TestKit;
-using Wordleans.Kernel.Grains;
+using Wordleans.Kernel.Game;
 using Xunit;
 
 namespace Wordleans.Tests.GrainsTests;

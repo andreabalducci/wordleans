@@ -4,8 +4,10 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using Orleans;
+using Orleans.Runtime;
 using Serilog;
 using Wordleans.Api.Grains;
+using Wordleans.Kernel.Stats;
 using Xunit;
 using Xunit.Abstractions;
 
@@ -51,14 +53,6 @@ public class EngineTests : IDisposable
     [Fact]
     public async Task LoadTest()
     {
-        string[][] guesses =
-        {
-            new[] { "HELLO", "HELLO", "WOUND", "WORLD", "HELLO", "CRANK" },
-            new[] { "HELLO", "HELLO", "WOUND", "WORLD", "HELLO", "HELLO" },
-            new[] { "WORLD", "CRANK" },
-            new[] { "CRANK" }
-        };
-
         var sw = new Stopwatch();
         sw.Start();
         int playing = 0;
@@ -70,10 +64,9 @@ public class EngineTests : IDisposable
         {
             try
             {
-                var script = guesses[i % guesses.Length];
                 var robot = _client.GetGrain<IRobot>($"Robot_{i:D3}");
                 var player = $"Player_{i:D3}";
-                var result = await robot.Play(player, script);
+                var result = await robot.Play(player, i);
                 int _ = result switch
                 {
                     RobotPlayResult.Lost => Interlocked.Increment(ref lost),
@@ -92,6 +85,8 @@ public class EngineTests : IDisposable
         await Task.WhenAll(tasks);
         sw.Stop();
 
+        var stats = _client.GetGrain<IStats>(StatsDefaults.GrainId);
+        
         Log.Logger.Information
         (
             "Time elapsed {elapsed}. Won {Won} Lost {Lost} Playing {Playing} Exceptions {Exceptions}",
@@ -101,6 +96,14 @@ public class EngineTests : IDisposable
             playing,
             exceptions
         );
+
+        // background steam processing...
+        await Task.Delay(2_000);
+
+        var statWin = await stats.GetWins();
+        var statLosses = await stats.GetLosses();
+
+        Log.Logger.Information("Stats Wins {Wins} Lost {Lost}", statWin, statLosses);
     }
 
     public void Dispose()

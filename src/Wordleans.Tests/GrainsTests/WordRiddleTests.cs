@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 using Moq;
 using Orleans.TestKit;
 using Wordleans.Api.Grains;
-using Wordleans.Kernel.Grains;
+using Wordleans.Kernel.Game;
 using Xunit;
 
 namespace Wordleans.Tests.GrainsTests;

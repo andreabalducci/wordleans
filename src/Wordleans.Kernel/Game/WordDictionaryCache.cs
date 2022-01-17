@@ -4,7 +4,7 @@ using Orleans.Concurrency;
 using Orleans.Runtime;
 using Wordleans.Api.Grains;
 
-namespace Wordleans.Kernel.Grains;
+namespace Wordleans.Kernel.Game;
 
 [StatelessWorker]
 public class WordDictionaryCache : Grain, IWordDictionaryCache

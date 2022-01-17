@@ -2,7 +2,7 @@
 using Orleans;
 using Wordleans.Api.Grains;
 
-namespace Wordleans.Kernel.Grains;
+namespace Wordleans.Kernel.Game;
 
 public class WordDictionary : Grain, IWordDictionary
 {

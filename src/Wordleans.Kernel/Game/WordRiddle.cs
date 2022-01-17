@@ -2,7 +2,7 @@ using Microsoft.Extensions.Logging;
 using Orleans;
 using Wordleans.Api.Grains;
 
-namespace Wordleans.Kernel.Grains;
+namespace Wordleans.Kernel.Game;
 
 public class WordRiddle : Grain, IWordRiddle
 {

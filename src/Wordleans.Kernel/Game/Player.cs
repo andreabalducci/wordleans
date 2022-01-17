@@ -2,8 +2,9 @@ using Microsoft.Extensions.Logging;
 using Orleans;
 using Wordleans.Api.Grains;
 using Wordleans.Api.Services;
+using Wordleans.Kernel.Stats;
 
-namespace Wordleans.Kernel.Grains;
+namespace Wordleans.Kernel.Game;
 
 public class Player : Grain, IPlayer
 {
@@ -54,7 +55,22 @@ public class Player : Grain, IPlayer
             _stats.PercentWin = totalWon * 100.0M / _stats.Played;
         }
 
+        await TrackGameEnd(id, result);
+
         return result;
+    }
+
+    private async Task TrackGameEnd(string riddleId, GuessResult result)
+    {
+        if (!result.GameEnded)
+        {
+            return;
+        }
+
+        var provider = GetStreamProvider(StatsDefaults.StatsProvider);
+        var msg = new GameEndedMessage(riddleId, result);
+        await provider.GetStream<GameEndedMessage>(StatsDefaults.GrainId, StatsDefaults.Namespace)
+            .OnNextAsync(msg);
     }
 
     public Task<PlayerStatistics> GetStats()

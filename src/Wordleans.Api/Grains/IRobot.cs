@@ -11,5 +11,5 @@ public enum RobotPlayResult
 
 public interface IRobot : IGrainWithStringKey
 {
-    Task<RobotPlayResult> Play(string playerId, string[] script);
+    Task<RobotPlayResult> Play(string playerId, int seed);
 }
