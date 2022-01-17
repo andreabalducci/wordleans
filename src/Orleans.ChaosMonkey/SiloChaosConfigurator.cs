@@ -3,14 +3,13 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Orleans.Configuration;
 using Orleans.Hosting;
-using Orleans.TestingHost;
 
 namespace Orleans.ChaosMonkey;
 
-public class SiloChaosConfigurator : ISiloConfigurator
+public class SiloChaosConfigurator
 {
     private static int _counter;
-    
+
     public void Configure(ISiloBuilder siloBuilder)
     {
         var chaosOptions = new ChaosOptions($"Silo {_counter++}");
@@ -18,7 +17,7 @@ public class SiloChaosConfigurator : ISiloConfigurator
         {
             o.SystemResponseTimeout = TimeSpan.FromSeconds(5);
         });
-        
+
         siloBuilder.Configure<SiloConnectionOptions>(siloConnectionOptions =>
         {
             siloConnectionOptions.ConfigureSiloInboundConnection(connectionBuilder =>
@@ -36,17 +35,16 @@ public class SiloChaosConfigurator : ISiloConfigurator
         });
     }
 
-
     private static void AddMiddleware(
-        string name, 
-        IConnectionBuilder connectionBuilder, 
+        string name,
+        IConnectionBuilder connectionBuilder,
         SiloConnectionOptions options,
         ChaosOptions chaosOptions)
     {
         var loggerFactory =
             connectionBuilder.ApplicationServices.GetService(typeof(ILoggerFactory)) as ILoggerFactory ??
             NullLoggerFactory.Instance;
-        
+
         connectionBuilder.Use(next =>
         {
             var middleware = new ChaosMonkeyMiddleware(name, next, options, loggerFactory, chaosOptions);

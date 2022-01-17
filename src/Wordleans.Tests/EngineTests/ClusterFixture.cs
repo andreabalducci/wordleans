@@ -1,11 +1,28 @@
 using System;
 using Orleans.ChaosMonkey;
+using Orleans.Hosting;
 using Orleans.TestingHost;
 using Serilog;
 using Serilog.Events;
 using Xunit.Abstractions;
 
 namespace Wordleans.Tests.EngineTests;
+
+public class ChaosMonkeyCluster : ISiloConfigurator
+{
+    public static bool Enabled { get; set; } = false;
+
+    public void Configure(ISiloBuilder siloBuilder)
+    {
+        if (!Enabled)
+        {
+            return;
+        }
+
+        var chaos = new SiloChaosConfigurator();
+        chaos.Configure(siloBuilder);
+    }
+}
 
 public class ClusterFixture : IDisposable
 {
@@ -46,7 +63,7 @@ public class ClusterFixture : IDisposable
     {
         Cluster = new TestClusterBuilder(3)
             .AddSiloBuilderConfigurator<TestEngineSiloConfigurator>()
-            .AddSiloBuilderConfigurator<SiloChaosConfigurator>()
+            .AddSiloBuilderConfigurator<ChaosMonkeyCluster>()
             .Build();
 
         Cluster.Deploy();

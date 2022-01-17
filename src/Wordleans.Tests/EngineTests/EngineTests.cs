@@ -19,6 +19,9 @@ public class EngineTests : IDisposable
 
     public EngineTests(ITestOutputHelper helper)
     {
+        // ChaosMonkeyCluster.Enabled = false;
+
+
         // workaround for showing logs in rider
         _fixture = new ClusterFixture(helper);
         _client = _fixture.Cluster!.Client;
@@ -68,11 +71,10 @@ public class EngineTests : IDisposable
             try
             {
                 var script = guesses[i % guesses.Length];
-//            var script = guesses[1];
                 var robot = _client.GetGrain<IRobot>($"Robot_{i:D3}");
                 var player = $"Player_{i:D3}";
                 var result = await robot.Play(player, script);
-                int temp = result switch
+                int _ = result switch
                 {
                     RobotPlayResult.Lost => Interlocked.Increment(ref lost),
                     RobotPlayResult.Playing => Interlocked.Increment(ref playing),
