@@ -85,6 +85,10 @@ public class EngineTests : IDisposable
         await Task.WhenAll(tasks);
         sw.Stop();
 
+        await _client.GetStreamProvider(StatsDefaults.StatsProvider)
+            .GetStream<GameEndedMessage>(StatsDefaults.GrainId, StatsDefaults.Namespace)
+            .OnCompletedAsync();
+        
         var stats = _client.GetGrain<IStats>(StatsDefaults.GrainId);
         
         Log.Logger.Information
@@ -98,7 +102,7 @@ public class EngineTests : IDisposable
         );
 
         // background steam processing...
-        await Task.Delay(2_000);
+       // await Task.Delay(2_000);
 
         var statWin = await stats.GetWins();
         var statLosses = await stats.GetLosses();

@@ -64,6 +64,7 @@ public class ClusterFixture : IDisposable
         Cluster = new TestClusterBuilder(3)
             .AddSiloBuilderConfigurator<TestEngineSiloConfigurator>()
             .AddSiloBuilderConfigurator<ChaosMonkeyCluster>()
+            .AddClientBuilderConfigurator<TestClientConfigurator>()
             .Build();
 
         Cluster.Deploy();

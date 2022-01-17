@@ -1,7 +1,6 @@
 using System;
 using System.Threading.Tasks;
 using Microsoft.Extensions.DependencyInjection;
-using Orleans;
 using Orleans.Hosting;
 using Orleans.Providers;
 using Orleans.Runtime;
