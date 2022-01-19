@@ -11,6 +11,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wordleans.Tests", "Wordlean
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Orleans.ChaosMonkey", "Orleans.ChaosMonkey\Orleans.ChaosMonkey.csproj", "{17CAB19A-4944-4830-A371-3172E35DACC0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Wordleans.Sample", "Wordleans.Sample\Wordleans.Sample.csproj", "{7D86625D-A5D1-4494-BBDC-9BB0F427409D}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{17CAB19A-4944-4830-A371-3172E35DACC0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{17CAB19A-4944-4830-A371-3172E35DACC0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{17CAB19A-4944-4830-A371-3172E35DACC0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7D86625D-A5D1-4494-BBDC-9BB0F427409D}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7D86625D-A5D1-4494-BBDC-9BB0F427409D}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7D86625D-A5D1-4494-BBDC-9BB0F427409D}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7D86625D-A5D1-4494-BBDC-9BB0F427409D}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
